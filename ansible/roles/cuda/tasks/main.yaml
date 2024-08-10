@@ -20,21 +20,16 @@
     deb: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/{{ cuda_architecture.stdout }}/cuda-keyring_1.1-1_all.deb
     update_cache: true
 
-- name: Get dash-case name of cuda_version
-  ansible.builtin.shell: bash -c 'sed -e "s/\./-/g" <<< $(echo {{ cuda_version }})'
-  register: cuda__dash_case_cuda_version
-  changed_when: false
-
 - name: Install CUDA devel libraries except for cuda-drivers
   become: true
   ansible.builtin.apt:
     name:
-      - cuda-command-line-tools-{{ cuda__dash_case_cuda_version.stdout }}
-      - cuda-minimal-build-{{ cuda__dash_case_cuda_version.stdout }}
-      - libcusparse-dev-{{ cuda__dash_case_cuda_version.stdout }}
-      - libcublas-dev-{{ cuda__dash_case_cuda_version.stdout }}
-      - libcurand-dev-{{ cuda__dash_case_cuda_version.stdout }}
-      - cuda-nvml-dev-{{ cuda__dash_case_cuda_version.stdout }}
+      - cuda-command-line-tools-{{ cuda__dash_case_cuda_version }}
+      - cuda-minimal-build-{{ cuda__dash_case_cuda_version }}
+      - libcusparse-dev-{{ cuda__dash_case_cuda_version }}
+      - libcublas-dev-{{ cuda__dash_case_cuda_version }}
+      - libcurand-dev-{{ cuda__dash_case_cuda_version }}
+      - cuda-nvml-dev-{{ cuda__dash_case_cuda_version }}
     update_cache: true
   when: install_devel == 'y'
 
@@ -42,10 +37,10 @@
   become: true
   ansible.builtin.apt:
     name:
-      - cuda-minimal-build-{{ cuda__dash_case_cuda_version.stdout }}
-      - libcusparse-{{ cuda__dash_case_cuda_version.stdout }}
-      - libcublas-{{ cuda__dash_case_cuda_version.stdout }}
-      - libcurand-{{ cuda__dash_case_cuda_version.stdout }}
+      - cuda-minimal-build-{{ cuda__dash_case_cuda_version }}
+      - libcusparse-{{ cuda__dash_case_cuda_version }}
+      - libcublas-{{ cuda__dash_case_cuda_version }}
+      - libcurand-{{ cuda__dash_case_cuda_version }}
     update_cache: true
   when: install_devel == 'N'
 
@@ -53,7 +48,7 @@
   become: true
   ansible.builtin.apt:
     name:
-      - cuda-nvprof-{{ cuda__dash_case_cuda_version.stdout }}
+      - cuda-nvprof-{{ cuda__dash_case_cuda_version }}
     update_cache: true
   when: cuda_architecture.stdout == "x86_64"
 
