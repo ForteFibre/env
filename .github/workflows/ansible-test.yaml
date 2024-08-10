@@ -1,0 +1,15 @@
+name: setup-universe
+
+on:
+  pull_request:
+
+jobs:
+  setup-universe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run setup script
+        run: |
+          ./setup-dev-env.sh -y -v universe
