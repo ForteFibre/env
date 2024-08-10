@@ -1,2 +1,2 @@
 ---
-cuda__dash_case_cuda_version: '{{ cuda_version | regex_replace("\\.", "-", count=1) }}'
+cuda__dash_case_cuda_version: '{{ cuda_version | regex_replace("\.", "-") }}'
