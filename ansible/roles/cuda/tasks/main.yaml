@@ -34,8 +34,9 @@
       - libcusparse-dev-{{ cuda__dash_case_cuda_version.stdout }}
       - libcublas-dev-{{ cuda__dash_case_cuda_version.stdout }}
       - libcurand-dev-{{ cuda__dash_case_cuda_version.stdout }}
+      - cuda-nvml-dev-{{ cuda__dash_case_cuda_version.stdout }}
     update_cache: true
-  when: install_devel == 'true'
+  when: install_devel == 'y'
 
 - name: Install CUDA libraries except for cuda-drivers
   become: true
@@ -46,7 +47,7 @@
       - libcublas-{{ cuda__dash_case_cuda_version.stdout }}
       - libcurand-{{ cuda__dash_case_cuda_version.stdout }}
     update_cache: true
-  when: install_devel == 'false'
+  when: install_devel == 'N'
 
 - name: Install extra CUDA libraries for x86_64
   become: true
@@ -65,20 +66,28 @@
   when: cuda_install_drivers | bool
 
 - name: Add PATH to .bashrc
+  become: true
   ansible.builtin.lineinfile:
-    dest: ~/.bashrc
+    dest: "{{ item }}"
     line: export PATH="/usr/local/cuda/bin:$PATH"
     state: present
     create: true
     mode: 0644
+  loop:
+    - ~/.bashrc
+    - /etc/skel/.bashrc
 
 - name: Add LD_LIBRARY_PATH to bashrc
+  become: true
   ansible.builtin.lineinfile:
-    dest: ~/.bashrc
+    dest: "{{ item }}"
     line: export LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
     state: present
     create: true
     mode: 0644
+  loop:
+    - ~/.bashrc
+    - /etc/skel/.bashrc
 
 - name: Create Vulkan directory
   become: true
