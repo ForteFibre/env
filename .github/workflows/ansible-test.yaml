@@ -2,6 +2,7 @@ name: setup-universe
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   setup-universe:
