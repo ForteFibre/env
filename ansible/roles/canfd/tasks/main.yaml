@@ -1,0 +1,28 @@
+- name: Add systemd managed CAN interface
+  ansible.builtin.blockinfile:
+    path: /etc/systemd/network/80-can.network
+    create: true
+    mode: "0644"
+    block: |
+      [Match]
+      Name=can*
+
+      [CAN]
+      BitRate=500000
+      FDMode=yes
+      SamplePoint=75%
+      DataBitRate=4000000
+      DataSamplePoint=80%
+      RestartSec=0.5s
+  become: true
+- name: Add CAN utils
+  ansible.builtin.apt:
+    name: can-utils
+  become: true
+- name: Disable network wait on boot
+  ansible.builtin.systemd:
+    unit: systemd-networkd-wait-online.service
+    enabled: false
+    state: stopped
+    masked: true
+  become: true

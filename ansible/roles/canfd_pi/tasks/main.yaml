@@ -1,0 +1,20 @@
+- name: Disable serial console
+  ansible.builtin.replace:
+    path: /boot/firmware/cmdline.txt
+    # backup: yes
+    regexp: console=serial0,[0-9]+
+    replace: ""
+  become: true
+- name: Enable CAN FD driver
+  ansible.builtin.blockinfile:
+    block: |
+      dtparam=spi=on
+
+      # Disable internal bluetooth
+      dtoverlay=disable-bt
+
+      dtoverlay=spi0-2cs,cs0_pin=8,cs1_pin=7
+      dtoverlay=mcp251xfd,spi0-0,interrupt=25,oscillator=20000000
+    # backup: yes
+    path: /boot/firmware/config.txt
+  become: true
