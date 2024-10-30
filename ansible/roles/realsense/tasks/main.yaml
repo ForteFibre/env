@@ -1,0 +1,43 @@
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - cmake
+      - libssl-dev
+      - freeglut3-dev
+      - libusb-1.0-0-dev
+      - pkg-config
+      - libgtk-3-dev
+      - unzip
+    state: present
+
+- name: Clone SDK
+  ansible.builtin.git:
+    repo: https://github.com/IntelRealSense/librealsense.git
+    dest: /tmp/librealsense
+    version: v2.56.0
+
+- name: Check CUDA installation
+  ansible.builtin.shell: |
+    ls /usr/local/cuda*
+  register: cuda_check
+  ignore_errors: true
+  changed_when: false
+  check_mode: false
+
+- name: Build SDK
+  ansible.builtin.shell: |
+    cd /tmp/librealsense
+    mkdir build
+    cd build
+    cmake .. -DFORCE_LIBUVC=true -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_CUDA={{ cuda_check.rc == 0 | ternary("ON", "OFF") }}
+    make -j$(nproc)
+    make install
+  register: build_result
+  changed_when: build_result.rc == 0
+
+- name: Remove build files
+  ansible.builtin.file:
+    path: /tmp/librealsense
+    state: absent
+  when: build_result.rc == 0
