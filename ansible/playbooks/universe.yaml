@@ -36,6 +36,12 @@
     - role: autoware.dev_env.gdown
     - role: autoware.dev_env.build_tools
 
+    - role: autoware.dev_env.foxglove
+      when: install_devel == 'true'
+    - role: autoware.dev_env.odrive
+    - role: autoware.dev_env.realsense
+    - role: autoware.dev_env.azure_kinect
+
     # Autoware module dependencies
     - role: autoware.dev_env.cuda
       when: prompt_install_nvidia == 'y'
