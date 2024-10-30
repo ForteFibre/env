@@ -8,7 +8,6 @@
       - containerd
       - runc
     state: absent
-    update_cache: true
 
 - name: Install dependencies for setting up apt sources
   become: true
