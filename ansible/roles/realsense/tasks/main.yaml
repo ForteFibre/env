@@ -32,12 +32,22 @@
     cd build
     cmake .. -DFORCE_LIBUVC=true -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_CUDA={{ cuda_check.rc == 0 | ternary("ON", "OFF") }}
     make -j$(nproc)
-    make install
   register: build_result
   changed_when: build_result.rc == 0
+
+- name: Install SDK
+  ansible.builtin.shell: |
+    cd /tmp/librealsense/build
+    make install
+    cp config/99-realsense-libusb.rules /etc/udev/rules.d/
+    cp config/99-realsense-d4xx-mipi-dfu.rules /etc/udev/rules.d/
+  when: build_result.rc == 0
+  register: install_result
+  become: true
+  changed_when: install_result.rc == 0
 
 - name: Remove build files
   ansible.builtin.file:
     path: /tmp/librealsense
     state: absent
-  when: build_result.rc == 0
+  when: build_result.rc == 0 and install_result.rc == 0
