@@ -3,6 +3,9 @@ name: setup-universe
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
 
 jobs:
   setup-universe:
