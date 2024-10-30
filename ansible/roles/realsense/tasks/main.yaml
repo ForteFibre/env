@@ -53,8 +53,8 @@
   ansible.builtin.shell: |
     cd /tmp/librealsense/build
     make install
-    cp config/99-realsense-libusb.rules /etc/udev/rules.d/
-    cp config/99-realsense-d4xx-mipi-dfu.rules /etc/udev/rules.d/
+    cp ../config/99-realsense-libusb.rules /etc/udev/rules.d/
+    cp ../config/99-realsense-d4xx-mipi-dfu.rules /etc/udev/rules.d/
   when: build_result.rc == 0
   register: install_result
   become: true
