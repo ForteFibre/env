@@ -1,3 +1,13 @@
+- name: Remove unwanted packages
+  ansible.builtin.apt:
+    name:
+      - librealsense2-dkms
+      - librealsense2-utils
+      - librealsense2-dev
+      - librealsense2-dbg
+      - ros-{{ rosdistro }}-librealsense2
+    state: absent
+
 - name: Install dependencies
   ansible.builtin.apt:
     name:
