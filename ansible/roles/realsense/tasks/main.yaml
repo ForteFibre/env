@@ -7,6 +7,7 @@
       - librealsense2-dbg
       - ros-{{ rosdistro }}-librealsense2
     state: absent
+  become: true
 
 - name: Install dependencies
   ansible.builtin.apt:
@@ -20,12 +21,14 @@
       - libgtk-3-dev
       - unzip
     state: present
+  become: true
 
 - name: Clone SDK
   ansible.builtin.git:
     repo: https://github.com/IntelRealSense/librealsense.git
     dest: /tmp/librealsense
     version: v2.56.0
+  become: true
 
 - name: Check CUDA installation
   ansible.builtin.shell: |
@@ -44,6 +47,7 @@
     make -j$(nproc)
   register: build_result
   changed_when: build_result.rc == 0
+  become: true
 
 - name: Install SDK
   ansible.builtin.shell: |
@@ -61,3 +65,4 @@
     path: /tmp/librealsense
     state: absent
   when: build_result.rc == 0 and install_result.rc == 0
+  become: true

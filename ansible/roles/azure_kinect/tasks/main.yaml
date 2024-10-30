@@ -22,12 +22,14 @@
       - mesa-common-dev
       - uuid-dev
     state: present
+  become: true
 
 - name: Clone SDK
   ansible.builtin.git:
     repo: https://github.com/ForteFibre/Azure-Kinect-Sensor-SDK.git
     dest: /tmp/Azure-Kinect-Sensor-SDK
     version: feature/ubuntu22.04
+  become: true
 
 - name: Build SDK
   ansible.builtin.shell: |
@@ -38,6 +40,7 @@
     make -j$(nproc)
   register: build_result
   changed_when: build_result.rc == 0
+  become: true
 
 - name: Install SDK
   ansible.builtin.shell: |
@@ -54,6 +57,7 @@
     url: https://packages.microsoft.com/ubuntu/18.04/multiarch/prod/pool/main/libk/libk4a1.4/libk4a1.4_1.4.1_{{ ansible_architecture == 'x86_64' | ternary('amd64', 'arm64') }}.deb
     dest: /tmp/Azure-Kinect-Sensor-SDK/libk4a.deb
     mode: 0644
+  become: true
 
 - name: Install closed-source firmware
   ansible.builtin.shell: |
@@ -62,8 +66,10 @@
     cp usr/lib/*/libk4a1.4/libdepthengine.so.2.0 /usr/lib/{{ ansible_architecture == 'x86_64' | ternary('x86_64', 'aarch64') }}-linux-gnu/
   register: firmware_result
   changed_when: firmware_result.rc == 0
+  become: true
 
 - name: Remove build files
   ansible.builtin.file:
     path: /tmp/Azure-Kinect-Sensor-SDK
     state: absent
+  become: true
