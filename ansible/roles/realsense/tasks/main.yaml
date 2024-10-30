@@ -27,7 +27,7 @@
   ansible.builtin.git:
     repo: https://github.com/IntelRealSense/librealsense.git
     dest: /tmp/librealsense
-    version: v2.56.0
+    version: "{{ realsense__librealsense_version }}"
   become: true
 
 - name: Check CUDA installation
