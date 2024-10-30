@@ -16,9 +16,6 @@ print_help() {
     echo "  --no-nvidia     Disable installation of the NVIDIA-related roles ('cuda' and 'tensorrt')"
     echo "  --no-cuda-drivers Disable installation of 'cuda-drivers' in the role 'cuda'"
     echo "  --runtime       Disable installation dev package of role 'cuda' and 'tensorrt'"
-    echo "  --data-dir      Set data directory (default: $HOME/autoware_data)"
-    echo "  --download-artifacts"
-    echo "                  Download artifacts"
     echo "  --module        Specify the module (default: all)"
     echo ""
 }
@@ -27,7 +24,6 @@ SCRIPT_DIR=$(readlink -f "$(dirname "$0")")
 
 # Parse arguments
 args=()
-option_data_dir="$HOME/autoware_data"
 
 while [ "$1" != "" ]; do
     case "$1" in
@@ -54,15 +50,6 @@ while [ "$1" != "" ]; do
     --runtime)
         # Disable installation dev package of role 'cuda' and 'tensorrt'.
         option_runtime=true
-        ;;
-    --data-dir)
-        # Set data directory
-        option_data_dir="$2"
-        shift
-        ;;
-    --download-artifacts)
-        # Set download artifacts option
-        option_download_artifacts=true
         ;;
     --module)
         option_module="$2"
@@ -125,27 +112,6 @@ if [ "$option_runtime" = "true" ]; then
 else
     ansible_args+=("--extra-vars" "install_devel=y")
 fi
-
-# Check downloading artifacts
-if [ "$option_yes" = "true" ] || [ "$option_download_artifacts" = "true" ]; then
-    echo -e "\e[36mArtifacts will be downloaded to $option_data_dir\e[m"
-    ansible_args+=("--extra-vars" "prompt_download_artifacts=y")
-fi
-
-# Check downloading artifacts
-if [ "$target_playbook" = "autoware.dev_env.openadk" ]; then
-    if [ "$option_download_artifacts" = "true" ]; then
-        echo -e "\e[36mArtifacts will be downloaded to $option_data_dir\e[m"
-        ansible_args+=("--extra-vars" "prompt_download_artifacts=y")
-    else
-        ansible_args+=("--extra-vars" "prompt_download_artifacts=N")
-    fi
-elif [ "$option_yes" = "true" ] || [ "$option_download_artifacts" = "true" ]; then
-    echo -e "\e[36mArtifacts will be downloaded to $option_data_dir\e[m"
-    ansible_args+=("--extra-vars" "prompt_download_artifacts=y")
-fi
-
-ansible_args+=("--extra-vars" "data_dir=$option_data_dir")
 
 # Check module option
 if [ "$option_module" != "" ]; then
