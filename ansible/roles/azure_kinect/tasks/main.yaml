@@ -38,7 +38,7 @@
     mkdir build
     cd build
     cmake .. -DCMAKE_BUILD_TYPE=Release
-    make -j$(nproc)
+    make
   register: build_result
   changed_when: build_result.rc == 0
   become: true
