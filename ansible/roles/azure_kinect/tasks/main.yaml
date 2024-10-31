@@ -55,7 +55,7 @@
 
 - name: Download closed-source firmware
   ansible.builtin.get_url:
-    url: https://packages.microsoft.com/ubuntu/18.04/multiarch/prod/pool/main/libk/libk4a1.4/libk4a1.4_1.4.1_{{ ansible_architecture == 'x86_64' | ternary('amd64', 'arm64') }}.deb
+    url: https://packages.microsoft.com/ubuntu/18.04/multiarch/prod/pool/main/libk/libk4a1.4/libk4a1.4_1.4.1_{{ (ansible_architecture == 'x86_64') | ternary('amd64', 'arm64') }}.deb
     dest: /tmp/Azure-Kinect-Sensor-SDK/libk4a.deb
     mode: 0644
   become: true
@@ -64,7 +64,7 @@
   ansible.builtin.shell: |
     cd /tmp/Azure-Kinect-Sensor-SDK
     ar vx libk4a.deb && tar zxvf data.tar.gz
-    cp usr/lib/*/libk4a1.4/libdepthengine.so.2.0 /usr/lib/{{ ansible_architecture == 'x86_64' | ternary('x86_64', 'aarch64') }}-linux-gnu/
+    cp usr/lib/*/libk4a1.4/libdepthengine.so.2.0 /usr/lib/{{ (ansible_architecture == 'x86_64') | ternary('x86_64', 'aarch64') }}-linux-gnu/
   register: firmware_result
   changed_when: firmware_result.rc == 0
   become: true

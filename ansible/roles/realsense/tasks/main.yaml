@@ -43,7 +43,7 @@
     cd /tmp/librealsense
     mkdir build
     cd build
-    cmake .. -DFORCE_LIBUVC=true -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_CUDA={{ cuda_check.rc == 0 | ternary("ON", "OFF") }}
+    cmake .. -DFORCE_LIBUVC=true -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_CUDA={{ (cuda_check.rc == 0) | ternary("ON", "OFF") }}
     make -j$(nproc)
   register: build_result
   changed_when: build_result.rc == 0
