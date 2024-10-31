@@ -26,9 +26,9 @@
 
 - name: Clone SDK
   ansible.builtin.git:
-    repo: https://github.com/ForteFibre/Azure-Kinect-Sensor-SDK.git
+    repo: https://github.com/asukiaaa/Azure-Kinect-Sensor-SDK.git
     dest: /tmp/Azure-Kinect-Sensor-SDK
-    version: feature/ubuntu22.04
+    version: feature/support-ubuntu-22.04
     recursive: true
   become: true
 
