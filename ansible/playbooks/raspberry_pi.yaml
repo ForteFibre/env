@@ -1,0 +1,7 @@
+- name: Set up Raspberry Pi hardware
+  hosts: targets
+  become: true
+  roles:
+    - role: autoware.dev_env.disable_unwanted_service
+    - role: autoware.dev_env.canfd
+    - role: autoware.dev_env.canfd_pi
