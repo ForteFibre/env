@@ -1,0 +1,7 @@
+- name: Set up Raspberry Pi hardware
+  hosts: targets
+  become: true
+  roles:
+    - role: disable_unwanted_service
+    - role: canfd
+    - role: canfd_pi

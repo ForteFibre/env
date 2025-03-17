@@ -1,0 +1,31 @@
+- name: Hold check of {{ rmw_implementation__package_name }}
+  ansible.builtin.command: apt-mark showhold
+  register: held_ros_packages
+  changed_when: false
+
+- name: Install {{ rmw_implementation__package_name }}
+  become: true
+  ansible.builtin.apt:
+    name: "{{ rmw_implementation__package_name }}"
+    state: latest
+    update_cache: true
+  when: "rmw_implementation__package_name not in held_ros_packages.stdout"
+  register: install_result
+  failed_when: false
+
+- name: Display warning if ROS 2 RMW package is held
+  ansible.builtin.debug:
+    msg: ROS 2 RMW package '{{ rmw_implementation__package_name }}' is apt-mark hold. Skipping installation.
+  when: not install_result.changed
+
+- name: Add RMW_IMPLEMENTATION to .bashrc
+  become: true
+  ansible.builtin.lineinfile:
+    dest: "{{ item }}"
+    line: export RMW_IMPLEMENTATION={{ rmw_implementation }}
+    state: present
+    create: true
+    mode: "0644"
+  loop:
+    - ~/.bashrc
+    - /etc/skel/.bashrc

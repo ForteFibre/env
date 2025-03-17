@@ -1,0 +1,7 @@
+- name: Disable unattended-upgrades
+  ansible.builtin.systemd:
+    unit: unattended-upgrades.service
+    enabled: false
+    state: stopped
+    masked: true
+  become: true

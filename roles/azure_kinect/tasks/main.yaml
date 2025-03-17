@@ -1,0 +1,76 @@
+- name: Verify OS
+  ansible.builtin.fail:
+    msg: Only Ubuntu 22.04 is supported
+  when: ansible_distribution_version != '22.04'
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - cmake
+      - libsoundio-dev
+      - libgl1-mesa-dev
+      - libjpeg-dev
+      - libvulkan-dev
+      - libx11-dev
+      - libxcursor-dev
+      - libxinerama-dev
+      - libxrandr-dev
+      - libusb-1.0-0-dev
+      - libssl-dev
+      - libudev-dev
+      - mesa-common-dev
+      - uuid-dev
+    state: present
+  become: true
+
+- name: Clone SDK
+  ansible.builtin.git:
+    repo: https://github.com/asukiaaa/Azure-Kinect-Sensor-SDK.git
+    dest: /tmp/Azure-Kinect-Sensor-SDK
+    version: feature/support-ubuntu-22.04
+    recursive: true
+  become: true
+
+- name: Build SDK
+  ansible.builtin.shell: |
+    cd /tmp/Azure-Kinect-Sensor-SDK
+    mkdir build
+    cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release
+    make
+  register: build_result
+  changed_when: build_result.rc == 0
+  become: true
+
+- name: Install SDK
+  ansible.builtin.shell: |
+    cd /tmp/Azure-Kinect-Sensor-SDK/build
+    make install
+    cp ../scripts/99-k4a.rules /etc/udev/rules.d/
+  when: build_result.rc == 0
+  register: install_result
+  become: true
+  changed_when: install_result.rc == 0
+
+- name: Download closed-source firmware
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/ubuntu/18.04/multiarch/prod/pool/main/libk/libk4a1.4/libk4a1.4_1.4.1_{{ (ansible_architecture == 'x86_64') | ternary('amd64', 'arm64') }}.deb
+    dest: /tmp/Azure-Kinect-Sensor-SDK/libk4a.deb
+    mode: "0644"
+  become: true
+
+- name: Install closed-source firmware
+  ansible.builtin.shell: |
+    cd /tmp/Azure-Kinect-Sensor-SDK
+    ar vx libk4a.deb && tar zxvf data.tar.gz
+    cp usr/lib/*/libk4a1.4/libdepthengine.so.2.0 /usr/lib/{{ (ansible_architecture == 'x86_64') | ternary('x86_64', 'aarch64') }}-linux-gnu/
+  register: firmware_result
+  changed_when: firmware_result.rc == 0
+  become: true
+
+- name: Remove build files
+  ansible.builtin.file:
+    path: /tmp/Azure-Kinect-Sensor-SDK
+    state: absent
+  become: true

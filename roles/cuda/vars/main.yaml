@@ -1,0 +1,2 @@
+cuda__dash_case_cuda_version: '{{ cuda_version | regex_replace("\.", "-") }}'
+cuda__lsb_release: '{{ ansible_lsb.release | regex_replace("\.", "") }}'

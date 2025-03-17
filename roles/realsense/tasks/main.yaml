@@ -1,0 +1,68 @@
+- name: Remove unwanted packages
+  ansible.builtin.apt:
+    name:
+      - librealsense2-dkms
+      - librealsense2-utils
+      - librealsense2-dev
+      - librealsense2-dbg
+      - ros-{{ rosdistro }}-librealsense2
+    state: absent
+  become: true
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - cmake
+      - libssl-dev
+      - freeglut3-dev
+      - libusb-1.0-0-dev
+      - pkg-config
+      - libgtk-3-dev
+      - unzip
+    state: present
+  become: true
+
+- name: Clone SDK
+  ansible.builtin.git:
+    repo: https://github.com/IntelRealSense/librealsense.git
+    dest: /tmp/librealsense
+    version: "{{ realsense__librealsense_version }}"
+  become: true
+
+- name: Check CUDA installation
+  ansible.builtin.shell: |
+    ls /usr/local/cuda*
+  register: cuda_check
+  ignore_errors: true
+  changed_when: false
+  check_mode: false
+
+- name: Build SDK
+  ansible.builtin.shell: |
+    cd /tmp/librealsense
+    mkdir build
+    cd build
+    cmake .. -DFORCE_LIBUVC=true -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_CUDA={{ (cuda_check.rc == 0) | ternary("ON", "OFF") }}
+    make -j$(nproc)
+  register: build_result
+  changed_when: build_result.rc == 0
+  become: true
+
+- name: Install SDK
+  ansible.builtin.shell: |
+    cd /tmp/librealsense/build
+    make install
+    cp ../config/99-realsense-libusb.rules /etc/udev/rules.d/
+    cp ../config/99-realsense-d4xx-mipi-dfu.rules /etc/udev/rules.d/
+  when: build_result.rc == 0
+  register: install_result
+  become: true
+  changed_when: install_result.rc == 0
+
+- name: Remove build files
+  ansible.builtin.file:
+    path: /tmp/librealsense
+    state: absent
+  when: build_result.rc == 0 and install_result.rc == 0
+  become: true

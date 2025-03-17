@@ -1,0 +1,2 @@
+---
+rmw_implementation__package_name: 'ros-{{ rosdistro }}-{{ rmw_implementation__rmw_implementation | regex_replace("_", "-") }}'

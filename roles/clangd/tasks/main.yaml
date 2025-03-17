@@ -1,0 +1,35 @@
+- name: Install clangd
+  become: true
+  ansible.builtin.apt:
+    name: clangd
+    state: latest
+    update_cache: true
+
+- name: Copy clang-format file
+  ansible.builtin.blockinfile:
+    block: |
+      ---
+      Language: Cpp
+      BasedOnStyle: Google
+
+      AccessModifierOffset: -2
+      AlignAfterOpenBracket: AlwaysBreak
+      BraceWrapping:
+        AfterClass: true
+        AfterFunction: true
+        AfterNamespace: true
+        AfterStruct: true
+        AfterEnum: true
+      BreakBeforeBraces: Custom
+      ColumnLimit: 100
+      ConstructorInitializerIndentWidth: 0
+      ContinuationIndentWidth: 2
+      DerivePointerAlignment: false
+      PointerAlignment: Middle
+      ReflowComments: false
+      ...
+    path: "{{ ansible_user_dir }}/.clang-format"
+  become: false
+  create: true
+  mode: "0644"
+  when: ansible_user_uid != 0

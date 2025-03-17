@@ -1,0 +1,12 @@
+- name: Install Foxglove Studio
+  ansible.builtin.apt:
+    deb: https://get.foxglove.dev/desktop/latest/foxglove-studio-2.15.1-linux-amd64.deb
+  become: true
+
+- name: Update Foxglove Studio
+  ansible.builtin.apt:
+    name:
+      - foxglove-studio
+    state: latest
+    update_cache: true
+  become: true
