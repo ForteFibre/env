@@ -38,23 +38,27 @@
     - vscode-icons-team.vscode-icons
   when: ansible_user_uid != 0
 
-- name: Install Visual Studio Code settings
+- name: Read Visual Studio Code settings
   become: false
-  ansible.builtin.copy:
-    dest: "{{ ansible_user_dir }}/.config/Code/User/settings.json"
-    force: false
-    mode: "0644"
-    content: |
+  ansible.builtin.slurp:
+    src: "{{ ansible_user_dir }}/.config/Code/User/settings.json"
+  register: vscode__settings
+  ignore_errors: true
+
+- name: Prepare JSON merge
+  ansible.builtin.set_fact:
+    vscode__settings_object: "{{ (vscode__settings.content | default('e30=')) | b64decode | from_json }}"
+    vscode__settings_override: |
       {
         "editor.formatOnSave": true,
         "workbench.iconTheme": "vscode-icons",
         "clangd.detectExtensionConflicts": false,
-        "cSpell.ignoreWords": [
-          "fortefibre",
-          "rclcpp",
-          "tourobo",
-          "harurobo",
-          "odometry"
-        ],
         "C_Cpp.intelliSenseEngine": "disabled"
       }
+
+- name: Install Visual Studio Code settings
+  ansible.builtin.copy:
+    content: "{{ vscode__settings_object | combine(vscode__settings_override | from_json) | to_nice_json(indent=2) }}"
+    dest: "{{ ansible_user_dir }}/.config/Code/User/settings.json"
+    force: true
+    mode: "0644"
