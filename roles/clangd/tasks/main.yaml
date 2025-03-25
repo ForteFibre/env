@@ -29,7 +29,7 @@
       ReflowComments: false
       ...
     path: "{{ ansible_user_dir }}/.clang-format"
+    create: true
+    mode: "0644"
   become: false
-  create: true
-  mode: "0644"
   when: ansible_user_uid != 0
