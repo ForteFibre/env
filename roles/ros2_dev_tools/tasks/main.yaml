@@ -27,7 +27,7 @@
     creates: /etc/ros/rosdep/sources.list.d/20-default.list
 
 - name: Install colcon-mixin-repository
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: |
       colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
       colcon mixin update default
@@ -43,3 +43,5 @@
           - mold
           - compile-commands
     path: "{{ ansible_user_dir }}/.colcon/defaults.yaml"
+    create: true
+    mode: "0644"

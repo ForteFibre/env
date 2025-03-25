@@ -17,15 +17,3 @@
   ansible.builtin.command: git lfs install
   when: "'filter.lfs.required' not in git_lfs__git_global_config.config_values"
   changed_when: true
-
-- name: Install pre-commit
-  ansible.builtin.pip:
-    name: pre-commit
-    state: latest
-    executable: pip3
-
-- name: Install clang-format
-  ansible.builtin.pip:
-    name: clang-format
-    version: "{{ pre_commit_clang_format_version }}"
-    executable: pip3
