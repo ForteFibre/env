@@ -16,6 +16,7 @@
       - python3-flake8-quotes
       - python3-pytest-repeat
       - python3-pytest-rerunfailures
+      - mold # Faster linker
     state: latest
     update_cache: true
 
@@ -24,3 +25,21 @@
   ansible.builtin.command:
     cmd: rosdep init
     creates: /etc/ros/rosdep/sources.list.d/20-default.list
+
+- name: Install colcon-mixin-repository
+  ansible.builtin.command:
+    cmd: |
+      colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+      colcon mixin update default
+    creates: "{{ ansible_user_dir }}/.colcon/mixin/default"
+
+- name: Activate recommended options
+  ansible.builtin.blockinfile:
+    block: |
+      build:
+        merge-install: true
+        symlink-install: true
+        mixin:
+          - mold
+          - compile-commands
+    path: "{{ ansible_user_dir }}/.colcon/defaults.yaml"
