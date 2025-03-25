@@ -9,3 +9,5 @@
     - role: clangd
     - role: vscode
     - role: foxglove
+    - role: misc_tools
+    - role: docker_engine
