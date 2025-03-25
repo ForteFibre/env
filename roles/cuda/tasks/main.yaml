@@ -31,18 +31,6 @@
       - libcurand-dev-{{ cuda__dash_case_cuda_version }}
       - cuda-nvml-dev-{{ cuda__dash_case_cuda_version }}
     update_cache: true
-  when: install_devel == 'y'
-
-- name: Install CUDA libraries except for cuda-drivers
-  become: true
-  ansible.builtin.apt:
-    name:
-      - cuda-minimal-build-{{ cuda__dash_case_cuda_version }}
-      - libcusparse-{{ cuda__dash_case_cuda_version }}
-      - libcublas-{{ cuda__dash_case_cuda_version }}
-      - libcurand-{{ cuda__dash_case_cuda_version }}
-    update_cache: true
-  when: install_devel == 'N'
 
 - name: Install extra CUDA libraries for x86_64
   become: true

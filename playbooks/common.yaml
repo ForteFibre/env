@@ -16,8 +16,4 @@
     - role: ros2_dev_tools
     - role: rmw_implementation
     - role: build_tools
-
-    - role: foxglove
-      when: install_devel == 'true'
-
     - role: dev_tools
