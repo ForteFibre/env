@@ -1,0 +1,37 @@
+- name: Authorize Microsoft GPG key
+  become: true
+  ansible.builtin.apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+
+- name: Add Visual Studio Code apt repository to source list
+  become: true
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] http://packages.microsoft.com/repos/code stable main
+    filename: vscode
+    state: present
+    update_cache: true
+
+- name: Install Visual Studio Code
+  become: true
+  ansible.builtin.apt:
+    name: code
+    state: latest
+    update_cache: true
+
+- name: Install Visual Studio Code extensions
+  become: false
+  ansible.builtin.shell:
+    cmd: |
+      code --install-extension {{ item }}
+    creates: "{{ ansible_user_dir }}/.vscode/extensions/{{ item }}-*"
+  loop:
+    - ms-vscode.cpptools-extension-pack
+    - llvm-vs-code-extensions.vscode-clangd
+    - streetsidesoftware.code-spell-checker
+    - mhutchie.git-graph
+    - ms-python.python
+    - ms-iot.vscode-ros
+    - ms-python.black-formatter
+    - ms-python.flake8
+    - redhat.vscode-xml
