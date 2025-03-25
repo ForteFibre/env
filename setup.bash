@@ -59,13 +59,18 @@ PLAYBOOKS=$(whiptail --title "Select Playbook" --checklist "Choose a playbook to
 
 echo -e "\e[36mRunning playbook: $PLAYBOOKS\e[m"
 
-# Make root playbook
-ROOT_PLAYBOOK=$SCRIPT_DIR/root.yaml
+# Import env
+ansible_args=("--ask-become-pass")
+
+for env_name in $(sed -e "s/^\s*//" -e "/^#/d" -e "s/=.*//" <amd64.env); do
+    ansible_args+=("--extra-vars" "${env_name}=${!env_name}")
+done
+
 for playbook in $PLAYBOOKS; do
-    cat "$SCRIPT_DIR/playbooks/$playbook" >>"$ROOT_PLAYBOOK"
+    ansible_args+=("$SCRIPT_DIR/playbooks/$playbook")
 done
 
 # Run ansible
-ansible-playbook -i "localhost," -c local "$ROOT_PLAYBOOK"
+ansible-playbook -i "localhost," -c local "${ansible_args[@]}"
 
 echo -e "\e[36mDone!\e[m"
