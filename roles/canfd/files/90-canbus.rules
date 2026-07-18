@@ -1,0 +1,5 @@
+# set altname
+SUBSYSTEM=="net", ACTION=="add", KERNEL=="can*", ATTRS{serial}=="?*", ATTRS{manufacturer}=="ForteFibre", RUN+="/bin/bash /etc/udev/rules.d/90-canbus-altname.sh %k $attr{serial}"
+
+# link up
+SUBSYSTEM=="net", ACTION=="add", KERNEL=="can*", RUN+="/usr/sbin/ip link set %k up type can bitrate 500000 dbitrate 4000000 fd on"

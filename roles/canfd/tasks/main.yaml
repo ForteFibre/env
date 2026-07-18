@@ -26,3 +26,15 @@
     state: stopped
     masked: true
   become: true
+- name: Copy CAN bus udev rules
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/90-canbus.rules"
+    dest: /etc/udev/rules.d/90-canbus.rules
+    mode: "0644"
+  become: true
+- name: Copy CAN bus altname script
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/90-canbus-altname.sh"
+    dest: /etc/udev/rules.d/90-canbus-altname.sh
+    mode: "0755"
+  become: true
