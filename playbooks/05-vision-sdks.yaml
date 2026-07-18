@@ -1,4 +1,4 @@
-- name: Set up device SDK for Ubuntu 22.04
+- name: Set up vision sensor SDKs for Ubuntu 22.04
   hosts: targets
   pre_tasks:
     - name: Verify OS
@@ -12,7 +12,6 @@
           - rosdistro: "{{ rosdistro }}"
           - rmw_implementation: "{{ rmw_implementation }}"
   roles:
-    - role: odrive
     - role: realsense
     - role: azure_kinect
       when: ansible_distribution_version == '22.04' # Only supported on Ubuntu 22.04

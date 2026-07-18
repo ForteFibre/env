@@ -1,0 +1,5 @@
+- name: Set up actuator drivers
+  hosts: targets
+  roles:
+    - role: odrive
+    - role: canfd
