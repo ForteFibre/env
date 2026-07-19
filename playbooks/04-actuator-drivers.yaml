@@ -1,0 +1,10 @@
+- name: Set up actuator drivers for Ubuntu 22.04/24.04
+  hosts: targets
+  pre_tasks:
+    - name: Verify OS
+      ansible.builtin.fail:
+        msg: Only Ubuntu 22.04 / 24.04 is supported
+      when: ansible_distribution != 'Ubuntu' or (ansible_distribution_version != '22.04' and ansible_distribution_version != '24.04')
+  roles:
+    - role: odrive
+    - role: canfd
