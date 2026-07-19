@@ -15,9 +15,11 @@
     dest: /etc/udev/rules.d/90-canbus.rules
     mode: "0644"
   become: true
+  notify: Reload udev rules
 - name: Copy CAN bus altname script
   ansible.builtin.copy:
     src: "{{ role_path }}/files/90-canbus-altname.sh"
     dest: /etc/udev/rules.d/90-canbus-altname.sh
     mode: "0755"
   become: true
+  notify: Reload udev rules
