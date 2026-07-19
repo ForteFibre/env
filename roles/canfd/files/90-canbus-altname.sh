@@ -9,13 +9,13 @@ HW_ID=${2-}
 LOCKFILE="/var/tmp/can_altname.lock"
 
 if [ -z "$ORIG_NAME" ] || [ -z "$HW_ID" ]; then
-    logger -t assign_can_altname "Error - Missing arguments"
+    /usr/bin/logger -t assign_can_altname "Error - Missing arguments"
     exit 1
 fi
 
 (
     # 排他制御
-    flock -w 5 9 || { logger -t assign_can_altname "Failed to acquire lock"; exit 1; }
+    /usr/bin/flock -w 5 9 || { /usr/bin/logger -t assign_can_altname "Failed to acquire lock"; exit 1; }
 
     PARENT_NET_DIR="/sys/class/net/$ORIG_NAME/device/net"
     CH_INDEX=0
@@ -23,8 +23,8 @@ fi
 
     # チャンネル総数と現在のチャンネルインデックスを特定
     if [ -d "$PARENT_NET_DIR" ]; then
-        CAN_DEVS=$(ls "$PARENT_NET_DIR" | grep '^can' | sort -V || true)
-        CH_TOTAL=$(echo "$CAN_DEVS" | grep -c '^can' || true)
+        CAN_DEVS=$(/usr/bin/ls "$PARENT_NET_DIR" | /usr/bin/grep '^can' | /usr/bin/sort -V || true)
+        CH_TOTAL=$(echo "$CAN_DEVS" | /usr/bin/grep -c '^can' || true)
 
         for dev in $CAN_DEVS; do
             if [ "$dev" = "$ORIG_NAME" ]; then
@@ -62,16 +62,16 @@ fi
         # 既に存在する場合は次の連番へ
         COUNTER=$((COUNTER + 1))
         if [ "$COUNTER" -gt 10 ]; then
-            logger -t assign_can_altname "Error - Too many identical IDs (${HW_ID})"
+            /usr/bin/logger -t assign_can_altname "Error - Too many identical IDs (${HW_ID})"
             exit 1
         fi
     done
 
     # 決定した altname を付与
     if /usr/sbin/ip link property add dev "$ORIG_NAME" altname "$TARGET_ALTNAME"; then
-        logger -t assign_can_altname "Success - Assigned $TARGET_ALTNAME to $ORIG_NAME"
+        /usr/bin/logger -t assign_can_altname "Success - Assigned $TARGET_ALTNAME to $ORIG_NAME"
     else
-        logger -t assign_can_altname "Error - Failed to Assign altname to $ORIG_NAME"
+        /usr/bin/logger -t assign_can_altname "Error - Failed to Assign altname to $ORIG_NAME"
     fi
 
 ) 9> "$LOCKFILE"
